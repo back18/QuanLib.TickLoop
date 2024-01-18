@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanLib.TickLoop", "QuanLib.TickLoop\QuanLib.TickLoop.csproj", "{7FE75C1E-698B-417F-B11F-EBEED5C7A611}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7FE75C1E-698B-417F-B11F-EBEED5C7A611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE75C1E-698B-417F-B11F-EBEED5C7A611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FE75C1E-698B-417F-B11F-EBEED5C7A611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FE75C1E-698B-417F-B11F-EBEED5C7A611}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EBC327CD-C5B4-4AB3-A758-0C39BEB6131E}
+	EndGlobalSection
+EndGlobal
