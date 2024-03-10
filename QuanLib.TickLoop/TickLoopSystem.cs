@@ -12,7 +12,7 @@ namespace QuanLib.TickLoop
 {
     public abstract class TickLoopSystem : UnmanagedRunnable, ITickUpdatable
     {
-        protected TickLoopSystem(TimeSpan tickPerTime, ILogbuilder? logbuilder = null) : base(logbuilder)
+        protected TickLoopSystem(TimeSpan tickPerTime, ILoggerGetter? loggerGetter = null) : base(loggerGetter)
         {
             TickPerTime = tickPerTime;
             SystemTick = 0;
