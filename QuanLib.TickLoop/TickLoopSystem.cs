@@ -16,12 +16,12 @@ namespace QuanLib.TickLoop
         {
             TickPerTime = tickPerTime;
             SystemTick = 0;
-            _tickTacks = new();
+            _tickTasks = new();
             _syatemStopwatch = new();
             _tickStopwatch = new();
         }
 
-        private readonly ConcurrentQueue<TickTask> _tickTacks;
+        private readonly ConcurrentQueue<TickTask> _tickTasks;
 
         private readonly Stopwatch _syatemStopwatch;
 
@@ -62,7 +62,7 @@ namespace QuanLib.TickLoop
             ArgumentNullException.ThrowIfNull(action, nameof(action));
 
             TickTask tickTask = new(action);
-            _tickTacks.Enqueue(tickTask);
+            _tickTasks.Enqueue(tickTask);
         }
 
         public async Task<TickTask> SubmitAndWaitAsync(Action action)
@@ -70,7 +70,7 @@ namespace QuanLib.TickLoop
             ArgumentNullException.ThrowIfNull(action, nameof(action));
 
             TickTask tickTask = new(action);
-            _tickTacks.Enqueue(tickTask);
+            _tickTasks.Enqueue(tickTask);
             await tickTask.WaitForCompleteAsync();
             return tickTask;
         }
@@ -87,7 +87,7 @@ namespace QuanLib.TickLoop
         {
             do
             {
-                while (_tickTacks.TryDequeue(out var tickTask))
+                while (_tickTasks.TryDequeue(out var tickTask))
                 {
                     tickTask.Start();
                     if (tickTask.State == TickTaskState.Failed && tickTask.Exception is not null)
