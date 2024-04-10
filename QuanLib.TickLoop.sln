@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuanLib.TickLoop.StateMachi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuanLib.TickLoop.VideoPlayer", "QuanLib.TickLoop.VideoPlayer\QuanLib.TickLoop.VideoPlayer.csproj", "{A6E3A538-1BD4-44EB-A2FC-D21268A8F4B9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuanLib.BusyWaiting", "..\QuanLib\QuanLib.BusyWaiting\QuanLib.BusyWaiting.csproj", "{FC04EEFD-FDF2-496C-8E7E-31E665190D5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A6E3A538-1BD4-44EB-A2FC-D21268A8F4B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6E3A538-1BD4-44EB-A2FC-D21268A8F4B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6E3A538-1BD4-44EB-A2FC-D21268A8F4B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC04EEFD-FDF2-496C-8E7E-31E665190D5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC04EEFD-FDF2-496C-8E7E-31E665190D5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC04EEFD-FDF2-496C-8E7E-31E665190D5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC04EEFD-FDF2-496C-8E7E-31E665190D5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

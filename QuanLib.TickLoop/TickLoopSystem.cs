@@ -1,4 +1,5 @@
-﻿using QuanLib.Core;
+﻿using QuanLib.BusyWaiting;
+using QuanLib.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,16 +17,19 @@ namespace QuanLib.TickLoop
         {
             TickPerTime = tickPerTime;
             SystemTick = 0;
-            _tickTasks = new();
             _syatemStopwatch = new();
             _tickStopwatch = new();
-        }
 
-        private readonly ConcurrentQueue<TickTask> _tickTasks;
+            _busyLoop = new(loggerGetter);
+            _busyLoop.SetDefaultThreadName("BusyLoop Thread");
+            AddSubtask(_busyLoop);
+        }
 
         private readonly Stopwatch _syatemStopwatch;
 
         private readonly Stopwatch _tickStopwatch;
+
+        private readonly BusyLoop _busyLoop;
 
         public TimeSpan SystemRunningTime => _syatemStopwatch.Elapsed;
 
@@ -59,20 +63,12 @@ namespace QuanLib.TickLoop
 
         public void Submit(Action action)
         {
-            ArgumentNullException.ThrowIfNull(action, nameof(action));
-
-            TickTask tickTask = new(action);
-            _tickTasks.Enqueue(tickTask);
+            _busyLoop.Submit(action);
         }
 
-        public async Task<TickTask> SubmitAndWaitAsync(Action action)
+        public async Task<LoopTask> SubmitAndWaitAsync(Action action)
         {
-            ArgumentNullException.ThrowIfNull(action, nameof(action));
-
-            TickTask tickTask = new(action);
-            _tickTasks.Enqueue(tickTask);
-            await tickTask.WaitForCompleteAsync();
-            return tickTask;
+            return await _busyLoop.SubmitAndWaitAsync(action);
         }
 
         private void ResetTick()
@@ -85,16 +81,12 @@ namespace QuanLib.TickLoop
 
         private void SystemInterrupt()
         {
-            do
-            {
-                while (_tickTasks.TryDequeue(out var tickTask))
-                {
-                    tickTask.Start();
-                    if (tickTask.State == TickTaskState.Failed && tickTask.Exception is not null)
-                        throw new AggregateException(tickTask.Exception);
-                }
-                Thread.Yield();
-            } while (IsRunning && TickRunningTime < TickPerTime);
+            if (!IsRunning)
+                return;
+
+            _busyLoop.Resume();
+            _busyLoop.SubmitAndWaitAsync(() => IsRunning && TickRunningTime >= TickPerTime).Wait();
+            _busyLoop.Pause();
         }
     }
 }

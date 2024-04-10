@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\QuanLib\QuanLib.BusyWaiting\QuanLib.BusyWaiting.csproj" />
     <ProjectReference Include="..\..\QuanLib\QuanLib.Core\QuanLib.Core.csproj" />
   </ItemGroup>
 
