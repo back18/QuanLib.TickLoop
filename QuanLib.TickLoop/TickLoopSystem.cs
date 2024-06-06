@@ -20,7 +20,7 @@ namespace QuanLib.TickLoop
             _syatemStopwatch = new();
             _tickStopwatch = new();
 
-            _busyLoop = new(loggerGetter);
+            _busyLoop = new(1, loggerGetter);
             _busyLoop.SetDefaultThreadName("BusyLoop Thread");
             AddSubtask(_busyLoop);
         }
@@ -50,8 +50,8 @@ namespace QuanLib.TickLoop
                 ResetTick();
                 OnBeforeTick();
                 OnTickUpdate(SystemTick);
-                SystemInterrupt();
                 OnAfterTick();
+                SystemInterrupt();
             }
         }
 
@@ -84,9 +84,13 @@ namespace QuanLib.TickLoop
             if (!IsRunning)
                 return;
 
+            TimeSpan tickPerTime = TickPerTime - TimeSpan.FromMilliseconds(_busyLoop.Accuracy + 1);
+
             _busyLoop.Resume();
-            _busyLoop.SubmitAndWaitAsync(() => IsRunning && TickRunningTime >= TickPerTime).Wait();
+            _busyLoop.SubmitAndWaitAsync(() => IsRunning && TickRunningTime >= tickPerTime).Wait();
             _busyLoop.Pause();
+
+            while (!IsRunning || TickRunningTime < TickPerTime) { }
         }
     }
 }
