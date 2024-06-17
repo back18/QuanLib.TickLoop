@@ -35,9 +35,9 @@ namespace QuanLib.TickLoop.VideoPlayer
 
         public int MaxCacheFrames { get; set; }
 
-        public event EventHandler<VideoDecoder<TPixel>, TimeSpanEventArgs> JumpedToFrame;
+        public event EventHandler<VideoDecoder<TPixel>, EventArgs<TimeSpan>> JumpedToFrame;
 
-        protected virtual void OnJumpedToFrame(VideoDecoder<TPixel> sender, TimeSpanEventArgs e)
+        protected virtual void OnJumpedToFrame(VideoDecoder<TPixel> sender, EventArgs<TimeSpan> e)
         {
             while (_cacheFrames.TryDequeue(out var videoFrame))
                 videoFrame.Dispose();

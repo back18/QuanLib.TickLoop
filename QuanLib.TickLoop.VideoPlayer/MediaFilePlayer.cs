@@ -3,7 +3,6 @@ using NAudio.Wave;
 using QuanLib.Core;
 using QuanLib.Core.Events;
 using QuanLib.TickLoop.StateMachine;
-using QuanLib.TickLoop.VideoPlayer.Events;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
@@ -108,20 +107,20 @@ namespace QuanLib.TickLoop.VideoPlayer
 
         public event EventHandler<MediaFilePlayer<TPixel>, EventArgs> Paused;
 
-        public event EventHandler<MediaFilePlayer<TPixel>, VideoFrameChangedEventArgs<TPixel>> VideoFrameChanged;
+        public event EventHandler<MediaFilePlayer<TPixel>, ValueChangedEventArgs<VideoFrame<TPixel>?>> VideoFrameChanged;
 
         protected virtual void OnPlayed(MediaFilePlayer<TPixel> sender, EventArgs e) { }
 
         protected virtual void OnPaused(MediaFilePlayer<TPixel> sender, EventArgs e) { }
 
-        protected virtual void OnVideoFrameChanged(MediaFilePlayer<TPixel> sender, VideoFrameChangedEventArgs<TPixel> e)
+        protected virtual void OnVideoFrameChanged(MediaFilePlayer<TPixel> sender, ValueChangedEventArgs<VideoFrame<TPixel>?> e)
         {
-            e.OldVideoFrame?.Dispose();
+            e.OldValue?.Dispose();
         }
 
-        private void VideoDecoder_JumpedToFrame(VideoDecoder<TPixel> sender, TimeSpanEventArgs e)
+        private void VideoDecoder_JumpedToFrame(VideoDecoder<TPixel> sender, EventArgs<TimeSpan> e)
         {
-            _start = e.TimeSpan;
+            _start = e.Argument;
             if (EnableAudio)
             {
                 if (MediaFoundationReader is not null)
