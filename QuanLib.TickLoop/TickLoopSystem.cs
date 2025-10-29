@@ -1,11 +1,9 @@
 ﻿using QuanLib.BusyWaiting;
 using QuanLib.Core;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +21,10 @@ namespace QuanLib.TickLoop
             _busyLoop = new(1, loggerGetter);
             _busyLoop.SetDefaultThreadName("BusyLoop Thread");
             AddSubtask(_busyLoop);
+
+            TickStart += OnTickStart;
+            TickUpdate += OnTickUpdate;
+            TickEnd += OnTickEnd;
         }
 
         private readonly Stopwatch _syatemStopwatch;
@@ -43,23 +45,29 @@ namespace QuanLib.TickLoop
 
         public int SystemTick { get; private set; }
 
+        public event TickUpdateHandler TickStart;
+
+        public event TickUpdateHandler TickUpdate;
+
+        public event TickUpdateHandler TickEnd;
+
         protected override void Run()
         {
             while (IsRunning)
             {
                 ResetTick();
-                OnBeforeTick();
-                OnTickUpdate(SystemTick);
-                OnAfterTick();
+                TickStart.Invoke(SystemTick);
+                TickUpdate.Invoke(SystemTick);
+                TickEnd.Invoke(SystemTick);
                 SystemInterrupt();
             }
         }
 
-        public abstract void OnBeforeTick();
+        protected abstract void OnTickStart(int tick);
 
         public abstract void OnTickUpdate(int tick);
 
-        public abstract void OnAfterTick();
+        protected abstract void OnTickEnd(int tick);
 
         public void Submit(Action action)
         {
