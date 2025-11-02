@@ -11,9 +11,9 @@ namespace QuanLib.TickLoop
 {
     public abstract class TickLoopSystem : UnmanagedRunnable, ITickUpdatable
     {
-        protected TickLoopSystem(TimeSpan tickPerTime, ILoggerGetter? loggerGetter = null) : base(loggerGetter)
+        protected TickLoopSystem(TimeSpan tickMaxTime, ILoggerGetter? loggerGetter = null) : base(loggerGetter)
         {
-            TickPerTime = tickPerTime;
+            TickMaxTime = tickMaxTime;
             SystemTick = 0;
             _syatemStopwatch = new();
             _tickStopwatch = new();
@@ -41,7 +41,7 @@ namespace QuanLib.TickLoop
 
         public TimeSpan TickEndTime { get; private set; }
 
-        public TimeSpan TickPerTime { get; }
+        public TimeSpan TickMaxTime { get; }
 
         public int SystemTick { get; private set; }
 
@@ -53,6 +53,8 @@ namespace QuanLib.TickLoop
 
         protected override void Run()
         {
+            _syatemStopwatch.Start();
+
             while (IsRunning)
             {
                 ResetTick();
@@ -61,6 +63,8 @@ namespace QuanLib.TickLoop
                 TickEnd.Invoke(SystemTick);
                 SystemInterrupt();
             }
+
+            _syatemStopwatch.Stop();
         }
 
         protected abstract void OnTickStart(int tick);
@@ -83,7 +87,7 @@ namespace QuanLib.TickLoop
         {
             SystemTick++;
             TickStartTime = SystemRunningTime;
-            TickEndTime = TickStartTime + TickStartTime;
+            TickEndTime = TickStartTime + TickMaxTime;
             _tickStopwatch.Restart();
         }
 
@@ -92,13 +96,13 @@ namespace QuanLib.TickLoop
             if (!IsRunning)
                 return;
 
-            TimeSpan tickPerTime = TickPerTime - TimeSpan.FromMilliseconds(_busyLoop.Accuracy + 1);
+            TimeSpan tickMaxTime = TickMaxTime - TimeSpan.FromMilliseconds(_busyLoop.DelayMilliseconds * 2);
 
             _busyLoop.Resume();
-            _busyLoop.SubmitAndWaitAsync(() => IsRunning && TickRunningTime >= tickPerTime).Wait();
+            _busyLoop.SubmitAndWaitAsync(() => !IsRunning || TickRunningTime >= tickMaxTime).Wait();
             _busyLoop.Pause();
 
-            while (!IsRunning || TickRunningTime < TickPerTime) { }
+            while (IsRunning && TickRunningTime < TickMaxTime) { }
         }
     }
 }
