@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace QuanLib.TickLoop
 {
-    public abstract class TickLoopSystem : UnmanagedRunnable, ITickUpdatable
+    public abstract class TickLoopSystem : MultitaskRunnable, ITickUpdatable
     {
         protected TickLoopSystem(TimeSpan tickMaxTime, ILoggerGetter? loggerGetter = null) : base(loggerGetter)
         {
@@ -19,6 +19,7 @@ namespace QuanLib.TickLoop
             _tickStopwatch = new();
 
             _busyLoop = new(1, loggerGetter);
+            _busyLoop.Pause();
             _busyLoop.SetDefaultThreadName("BusyLoop Thread");
             AddSubtask(_busyLoop);
 
@@ -73,14 +74,19 @@ namespace QuanLib.TickLoop
 
         protected abstract void OnTickEnd(int tick);
 
-        public void Submit(Action action)
+        public LoopTask Submit(Action action)
         {
-            _busyLoop.Submit(action);
+            return _busyLoop.Submit(action);
         }
 
-        public async Task<LoopTask> SubmitAndWaitAsync(Action action)
+        public void SubmitAndWait(Action action)
         {
-            return await _busyLoop.SubmitAndWaitAsync(action);
+            _busyLoop.SubmitAndWait(action);
+        }
+
+        public Task SubmitAndWaitAsync(Action action)
+        {
+            return _busyLoop.SubmitAndWaitAsync(action);
         }
 
         private void ResetTick()
@@ -98,9 +104,16 @@ namespace QuanLib.TickLoop
 
             TimeSpan tickMaxTime = TickMaxTime - TimeSpan.FromMilliseconds(_busyLoop.DelayMilliseconds * 2);
 
-            _busyLoop.Resume();
-            _busyLoop.SubmitAndWaitAsync(() => !IsRunning || TickRunningTime >= tickMaxTime).Wait();
-            _busyLoop.Pause();
+            if (TickRunningTime >= tickMaxTime)
+            {
+                _busyLoop.HandleSingleLoop();
+            }
+            else
+            {
+                _busyLoop.Resume();
+                _busyLoop.SubmitAndWait(() => !IsRunning || TickRunningTime >= tickMaxTime);
+                _busyLoop.Pause();
+            }
 
             while (IsRunning && TickRunningTime < TickMaxTime) { }
         }
