@@ -11,14 +11,14 @@ namespace QuanLib.TickLoop
 {
     public abstract class TickLoopSystem : MultitaskRunnable, ITickUpdatable
     {
-        protected TickLoopSystem(TimeSpan tickMaxTime, ILoggerGetter? loggerGetter = null) : base(loggerGetter)
+        protected TickLoopSystem(TimeSpan tickMaxTime, ILoggerProvider? loggerProvider = null) : base(loggerProvider)
         {
             TickMaxTime = tickMaxTime;
             SystemTick = 0;
             _syatemStopwatch = new();
             _tickStopwatch = new();
 
-            _busyLoop = new(1, loggerGetter);
+            _busyLoop = new(1, loggerProvider);
             _busyLoop.Pause();
             _busyLoop.SetDefaultThreadName("BusyLoop Thread");
             AddSubtask(_busyLoop);

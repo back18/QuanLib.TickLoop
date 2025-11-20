@@ -16,7 +16,7 @@ namespace QuanLib.TickLoop.VideoPlayer
 {
     public class VideoDecoder<TPixel> : UnmanagedRunnable where TPixel : unmanaged, IPixel<TPixel>
     {
-        public VideoDecoder(VideoStream videoStream, ILoggerGetter? loggerGetter = null) : base(loggerGetter)
+        public VideoDecoder(VideoStream videoStream, ILoggerProvider? loggerProvider = null) : base(loggerProvider)
         {
             ArgumentNullException.ThrowIfNull(videoStream, nameof(videoStream));
 
