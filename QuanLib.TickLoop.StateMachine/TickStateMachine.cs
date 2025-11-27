@@ -19,6 +19,8 @@ namespace QuanLib.TickLoop.StateMachine
             _stateQueue = new();
         }
 
+        private readonly Lock _lock = new();
+
         private readonly Queue<TState> _stateQueue;
 
         private readonly Dictionary<TState, StateContext<TState>> _stateContexts;
@@ -38,7 +40,7 @@ namespace QuanLib.TickLoop.StateMachine
 
         public void Submit(TState state)
         {
-            lock (_stateQueue)
+            lock (_lock)
             {
                 _stateQueue.Enqueue(state);
             }
@@ -46,7 +48,7 @@ namespace QuanLib.TickLoop.StateMachine
 
         public void OnTickUpdate(int tick)
         {
-            lock (_stateQueue)
+            lock (_lock)
             {
                 while (_stateQueue.TryPeek(out var state))
                 {
